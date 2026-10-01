@@ -27,29 +27,43 @@ jobs:
 
       - name: Set image names
         run: |
-          echo "CLIENT_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-client" >> $GITHUB_ENV
-          echo "SERVER_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-server" >> $GITHUB_ENV
+          echo "CLIENT_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-client" >> "$GITHUB_ENV"
+          echo "SERVER_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-server" >> "$GITHUB_ENV"
 
       - name: Build frontend image
         run: |
           docker build \
-            -t $CLIENT_IMAGE:${GITHUB_SHA} \
-            -t $CLIENT_IMAGE:latest \
+            -t "$CLIENT_IMAGE:${GITHUB_SHA}" \
+            -t "$CLIENT_IMAGE:latest" \
             ./client
 
       - name: Build backend image
         run: |
           docker build \
-            -t $SERVER_IMAGE:${GITHUB_SHA} \
-            -t $SERVER_IMAGE:latest \
+            -t "$SERVER_IMAGE:${GITHUB_SHA}" \
+            -t "$SERVER_IMAGE:latest" \
             ./server
 
       - name: Push frontend images
         run: |
-          docker push $CLIENT_IMAGE:${GITHUB_SHA}
-          docker push $CLIENT_IMAGE:latest
+          docker push "$CLIENT_IMAGE:${GITHUB_SHA}"
+          docker push "$CLIENT_IMAGE:latest"
 
       - name: Push backend images
         run: |
-          docker push $SERVER_IMAGE:${GITHUB_SHA}
-          docker push $SERVER_IMAGE:latest
+          docker push "$SERVER_IMAGE:${GITHUB_SHA}"
+          docker push "$SERVER_IMAGE:latest"
+
+      - name: Show published images
+        run: |
+          echo "Frontend image:"
+          echo "$CLIENT_IMAGE:${GITHUB_SHA}"
+
+          echo "Frontend latest:"
+          echo "$CLIENT_IMAGE:latest"
+
+          echo "Backend image:"
+          echo "$SERVER_IMAGE:${GITHUB_SHA}"
+
+          echo "Backend latest:"
+          echo "$SERVER_IMAGE:latest"
