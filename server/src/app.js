@@ -42,7 +42,7 @@ router.get("/users/all", async (req, res) => {
         const total = await prisma.user.count();
         return res.status(HTTP_STATUS.OK).send({
             success: true,
-            message: "Successfully received all users - CI/CD v2",
+            message: "Successfully received all users - CI/CD v3",
             data: {
                 users: users,
                 total: total,
