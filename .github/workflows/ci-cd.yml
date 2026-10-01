@@ -1,0 +1,55 @@
+name: CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set image names
+        run: |
+          echo "CLIENT_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-client" >> $GITHUB_ENV
+          echo "SERVER_IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/react-node-postgres-server" >> $GITHUB_ENV
+
+      - name: Build frontend image
+        run: |
+          docker build \
+            -t $CLIENT_IMAGE:${GITHUB_SHA} \
+            -t $CLIENT_IMAGE:latest \
+            ./client
+
+      - name: Build backend image
+        run: |
+          docker build \
+            -t $SERVER_IMAGE:${GITHUB_SHA} \
+            -t $SERVER_IMAGE:latest \
+            ./server
+
+      - name: Push frontend images
+        run: |
+          docker push $CLIENT_IMAGE:${GITHUB_SHA}
+          docker push $CLIENT_IMAGE:latest
+
+      - name: Push backend images
+        run: |
+          docker push $SERVER_IMAGE:${GITHUB_SHA}
+          docker push $SERVER_IMAGE:latest
